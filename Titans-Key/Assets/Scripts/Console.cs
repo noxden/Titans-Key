@@ -1,3 +1,9 @@
+//----------------------------------------------------------------
+// Darmstadt University of Applied Sciences, Expanded Realities
+// Script by:    Daniel Heilmann (771144)
+// Last changed:  05-05-22
+//----------------------------------------------------------------
+
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;

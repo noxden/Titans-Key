@@ -1,8 +1,14 @@
+//----------------------------------------------------------------
+// Darmstadt University of Applied Sciences, Expanded Realities
+// Script by:    Daniel Heilmann (771144)
+// Last changed:  05-05-22
+//----------------------------------------------------------------
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Effect : MonoBehaviour
+public abstract class Effect : MonoBehaviour
 {
     public string UID;
     public string displayName;

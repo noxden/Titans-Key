@@ -1,3 +1,9 @@
+//----------------------------------------------------------------
+// Darmstadt University of Applied Sciences, Expanded Realities
+// Script by:    Daniel Heilmann (771144)
+// Last changed:  05-05-22
+//----------------------------------------------------------------
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +28,7 @@ public sealed class CombatHandler : MonoBehaviour
     public int round;
     public List<Character> InitiativeTracker;
     public Character activeCharacter;
+    public CharacterDisplay characterDisplay;
 
     public void Start()
     {
@@ -44,7 +51,15 @@ public sealed class CombatHandler : MonoBehaviour
         foreach (Character character in GameObject.FindObjectsOfType<Character>())
         {
             InitiativeTracker.Add(character);   //Debug.Log($"Found: {character}", character.gameObject);
+            characterDisplay.addToken(character);   // TODO: Should be done with an event instead of closely linking CharacterDisplay to this class.
         }
+
+        if (InitiativeTracker.Count == 0)
+        {
+            Debug.LogError("Could not find any Characters, please make sure there is at least one Character in the scene.");
+            return;
+        }
+
         InitiativeTracker.Sort((b, a) => a.initiative.CompareTo(b.initiative));  // Performs an unstable sort (If two elements are equal, their order might not be preserved).
                                                                                  // https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.list-1.sort?view=net-6.0
         Debug.Log(Console.CharacterListToString(InitiativeTracker));
@@ -52,18 +67,35 @@ public sealed class CombatHandler : MonoBehaviour
 
     public void nextTurn()
     {
+        if (InitiativeTracker.Count == 0)   //< Guard clause for empty InitiativeTracker
+        {
+            Debug.LogError("InitiativeTracker does not contain any Characters. Prevented code execution in \"nextTurn()\". Attempting to fill InitiativeTracker again...");
+            fillInitiativeTracker();
+            return;
+        }
+
         if (turn % InitiativeTracker.Count == 0)
         {
-            round += 1;
-            turn = 0;
-            fillInitiativeTracker();
+            nextRound();
         }
 
         activeCharacter = InitiativeTracker[turn % InitiativeTracker.Count];    //< Overwrites activeCharacter with the corresponding character from the initiative list
 
         turn += 1;  //< Executed after the others, as otherwise their calculations would require a turn-1 everywhere
                     //  if this was the first line to be executed (because of the InitiativeTracker list indexes)
-        Console.Echo($"Now in turn {turn} in round {round}, which is {activeCharacter.name}'s turn.", activeCharacter.gameObject);
+        Console.Echo($"Now in turn {turn} of round {round}, which is {activeCharacter.name}'s turn!", activeCharacter.gameObject);
     }
 
+    public void nextRound()
+    {
+        round += 1;
+        turn = 0;
+        fillInitiativeTracker();
+    }
+
+    public void useActionAsActiveCharacter()
+    {
+        if (activeCharacter.DEBUGuseAction())
+            nextTurn();
+    }
 }
